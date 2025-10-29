@@ -30,15 +30,12 @@ public class InventoryEventProducer {
         Message<InventoryEvent> message = MessageBuilder
                 .withPayload(event)
                 .setHeader(KafkaHeaders.TOPIC, inventoryTopicName)
-                // some Spring Kafka versions don't expose MESSAGE_KEY constant; use literal header name
                 .setHeader("kafka_messageKey", event.getProductId().toString())
                 .setHeader("event-type", event.getStatus())
                 .build();
 
-        // send returns a (deprecated) ListenableFuture; keep it in a local var and bridge to CompletableFuture
         Object sendResult = kafkaTemplate.send(message);
 
-        // If modern Spring Kafka returns a CompletableFuture
         if (sendResult instanceof CompletableFuture<?> jf) {
             @SuppressWarnings("unchecked")
             CompletableFuture<SendResult<String, InventoryEvent>> cf =
@@ -54,7 +51,6 @@ public class InventoryEventProducer {
             return;
         }
 
-        // Fallback: treat as a java.util.concurrent.Future (covers older ListenableFuture implementations as well)
         if (sendResult instanceof java.util.concurrent.Future<?> fut) {
             CompletableFuture.runAsync(() -> {
                 try {
@@ -71,7 +67,6 @@ public class InventoryEventProducer {
             return;
         }
 
-        // Unknown type: log and return
         log.warn("Unexpected send() return type: {}", sendResult == null ? "null" : sendResult.getClass().getName());
     }
 }
