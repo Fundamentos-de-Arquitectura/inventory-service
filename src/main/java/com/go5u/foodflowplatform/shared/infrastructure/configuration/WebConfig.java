@@ -1,4 +1,4 @@
-package com.go4u.keepitfreshplatform.shared.infrastructure.configuration;
+package com.go5u.foodflowplatform.shared.infrastructure.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
