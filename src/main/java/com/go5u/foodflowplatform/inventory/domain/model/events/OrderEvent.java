@@ -18,5 +18,5 @@ public class OrderEvent {
     private String status;
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime timestamp;
-    private String customerId;
+    private Integer tableNumber;
 }

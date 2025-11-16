@@ -3,6 +3,7 @@ package com.go5u.foodflowplatform.inventory.application.internal.queryservices;
 import com.go5u.foodflowplatform.inventory.domain.model.aggregates.Product;
 import com.go5u.foodflowplatform.inventory.domain.model.queries.GetAllProductsQuery;
 import com.go5u.foodflowplatform.inventory.domain.model.queries.GetProductByIdQuery;
+import com.go5u.foodflowplatform.inventory.domain.model.queries.GetProductByNameQuery;
 import com.go5u.foodflowplatform.inventory.domain.services.ProductQueryService;
 import com.go5u.foodflowplatform.inventory.infrastructure.persistence.jpa.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -27,5 +28,10 @@ public class ProductQueryServiceImpl implements ProductQueryService {
     @Override
     public Optional<Product> handle(GetProductByIdQuery query) {
         return productRepository.findById(query.productId());
+    }
+
+    @Override
+    public Optional<Product> handle(GetProductByNameQuery query) {
+        return productRepository.findByName(query.name());
     }
 }

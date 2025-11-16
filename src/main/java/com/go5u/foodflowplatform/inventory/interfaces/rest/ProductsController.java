@@ -52,9 +52,16 @@ public class ProductsController {
             body.put("productId", product.getProductId());
             return ResponseEntity.ok(body);
 
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid input when creating product: {}", e.getMessage(), e);
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorBody);
         } catch (Exception e) {
             log.error("Error creating product in DB", e);
-            return ResponseEntity.badRequest().build();
+            Map<String, Object> errorBody = new HashMap<>();
+            errorBody.put("error", "Failed to create product: " + e.getMessage());
+            return ResponseEntity.badRequest().body(errorBody);
         }
     }
 

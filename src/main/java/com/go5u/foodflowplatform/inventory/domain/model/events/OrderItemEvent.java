@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderItemEvent {
-    private Long productId;
-    private String productName;
+    private Long dishId;
+    private String dishName;
     private Integer quantity;
     private BigDecimal price;
 }
