@@ -100,11 +100,11 @@ public class OrderEventConsumer {
             Double quantityToDecrease = entry.getValue();
 
             try {
-                // Find product by ingredient name
-                var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName));
+                // Find product by ingredient name and userId
+                var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName, event.getUserId()));
                 
                 if (productOpt.isEmpty()) {
-                    log.warn("Ingredient '{}' not found in inventory, skipping stock update", ingredientName);
+                    log.warn("Ingredient '{}' not found in inventory for user {}, skipping stock update", ingredientName, event.getUserId());
                     continue;
                 }
 
@@ -174,11 +174,11 @@ public class OrderEventConsumer {
             Double quantityToRestore = entry.getValue();
 
             try {
-                // Find product by ingredient name
-                var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName));
+                // Find product by ingredient name and userId
+                var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName, event.getUserId()));
                 
                 if (productOpt.isEmpty()) {
-                    log.warn("Ingredient '{}' not found in inventory, skipping stock restore", ingredientName);
+                    log.warn("Ingredient '{}' not found in inventory for user {}, skipping stock restore", ingredientName, event.getUserId());
                     continue;
                 }
 

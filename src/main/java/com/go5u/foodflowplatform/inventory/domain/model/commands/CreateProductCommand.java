@@ -8,5 +8,6 @@ public record CreateProductCommand(
         Long productId,
         Integer quantity,
         LocalDate expirationDate,
-        BigDecimal price
+        BigDecimal price,
+        Long userId
 ) {}

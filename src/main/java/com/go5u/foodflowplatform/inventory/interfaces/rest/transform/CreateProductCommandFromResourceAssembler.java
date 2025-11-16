@@ -4,13 +4,14 @@ import com.go5u.foodflowplatform.inventory.domain.model.commands.CreateProductCo
 import com.go5u.foodflowplatform.inventory.interfaces.rest.resources.CreateProductResource;
 
 public class CreateProductCommandFromResourceAssembler {
-    public static CreateProductCommand toCommandFromResource(CreateProductResource resource){
+    public static CreateProductCommand toCommandFromResource(CreateProductResource resource, Long userId){
         return new CreateProductCommand(
                 resource.name(),
                 resource.productItemId(),
                 resource.quantity(),
                 resource.expirationDate(),
-                resource.price()
+                resource.price(),
+                userId
         );
     }
 }

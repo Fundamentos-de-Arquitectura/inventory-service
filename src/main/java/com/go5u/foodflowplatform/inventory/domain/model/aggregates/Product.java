@@ -32,6 +32,9 @@ public class Product{
     @Embedded
     private Price price;
 
+    @jakarta.persistence.Column(nullable = false)
+    private Long userId;
+
     public Product() {
         this.name = Strings.EMPTY;
     }
@@ -41,6 +44,7 @@ public class Product{
         this.quantity = new Quantity(command.quantity());
         this.expirationDate = new ExpirationDate(command.expirationDate());
         this.price = new Price(command.price());
+        this.userId = command.userId();
     }
 
     public void decreaseQuantity(int amount) {

@@ -34,17 +34,20 @@ public class InventoryController {
     }
 
     /**
-     * Obtiene el stock disponible de un ingrediente por nombre
+     * Obtiene el stock disponible de un ingrediente por nombre para un usuario específico
+     * @param userId ID del usuario
      * @param ingredientName Nombre del ingrediente
      * @return Stock disponible del ingrediente
      */
-    @GetMapping("/ingredients/{ingredientName}/stock")
-    @Operation(summary = "Get stock by ingredient name", description = "Retrieve available stock for an ingredient")
-    public ResponseEntity<StockResponse> getStockByIngredientName(@PathVariable String ingredientName) {
+    @GetMapping("/users/{userId}/ingredients/{ingredientName}/stock")
+    @Operation(summary = "Get stock by ingredient name for a user", description = "Retrieve available stock for an ingredient for a specific user")
+    public ResponseEntity<StockResponse> getStockByIngredientName(
+            @PathVariable Long userId,
+            @PathVariable String ingredientName) {
         try {
-            log.info("Fetching stock for ingredient: {}", ingredientName);
+            log.info("Fetching stock for ingredient: {} for user {}", ingredientName, userId);
 
-            var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName));
+            var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName, userId));
             
             if (productOpt.isEmpty()) {
                 log.warn("Ingredient {} not found in inventory", ingredientName);
@@ -67,20 +70,22 @@ public class InventoryController {
     }
 
     /**
-     * Resta cantidad de un ingrediente del inventario
+     * Resta cantidad de un ingrediente del inventario para un usuario específico
+     * @param userId ID del usuario
      * @param ingredientName Nombre del ingrediente
      * @param request Cantidad a restar
      * @return Respuesta de éxito o error
      */
-    @PostMapping("/ingredients/{ingredientName}/decrease")
-    @Operation(summary = "Decrease ingredient stock", description = "Decrease the stock of an ingredient")
+    @PostMapping("/users/{userId}/ingredients/{ingredientName}/decrease")
+    @Operation(summary = "Decrease ingredient stock for a user", description = "Decrease the stock of an ingredient for a specific user")
     public ResponseEntity<Map<String, String>> decreaseIngredientStock(
+            @PathVariable Long userId,
             @PathVariable String ingredientName,
             @RequestBody DecreaseStockRequest request) {
         try {
-            log.info("Decreasing stock for ingredient {} by {}", ingredientName, request.quantity());
+            log.info("Decreasing stock for ingredient {} by {} for user {}", ingredientName, request.quantity(), userId);
 
-            var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName));
+            var productOpt = productQueryService.handle(new GetProductByNameQuery(ingredientName, userId));
             
             if (productOpt.isEmpty()) {
                 log.warn("Ingredient {} not found in inventory", ingredientName);

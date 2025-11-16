@@ -36,18 +36,20 @@ public class ProductsController {
         this.productQueryService = productQueryService;
     }
 
-    @PostMapping
+    @PostMapping("/users/{userId}")
     @Operation(summary = "Create a new product in the DB",
             description = "Persist a new product record to the database using JPA")
-    public ResponseEntity<Map<String, Object>> createProduct(@RequestBody CreateProductResource resource) {
+    public ResponseEntity<Map<String, Object>> createProduct(
+            @PathVariable Long userId,
+            @RequestBody CreateProductResource resource) {
         try {
-            log.info("Creating product in DB: {}", resource);
+            log.info("Creating product in DB for user {}: {}", userId, resource);
 
-            CreateProductCommand command = CreateProductCommandFromResourceAssembler.toCommandFromResource(resource);
+            CreateProductCommand command = CreateProductCommandFromResourceAssembler.toCommandFromResource(resource, userId);
             var product = new com.go5u.foodflowplatform.inventory.domain.model.aggregates.Product(command);
             productRepository.save(product);
 
-            log.info("Successfully created product in DB with id {}", product.getProductId());
+            log.info("Successfully created product in DB with id {} for user {}", product.getProductId(), userId);
             Map<String, Object> body = new HashMap<>();
             body.put("productId", product.getProductId());
             return ResponseEntity.ok(body);
@@ -65,38 +67,43 @@ public class ProductsController {
         }
     }
 
-    @GetMapping
-    @Operation(summary = "Get all products from the database")
-    public ResponseEntity<List<Product>> getAllProducts() {
+    @GetMapping("/users/{userId}")
+    @Operation(summary = "Get all products from the database for a user")
+    public ResponseEntity<List<Product>> getAllProducts(@PathVariable Long userId) {
         try {
-            log.info("Fetching all products from DB");
-            List<Product> products = productQueryService.handle(new GetAllProductsQuery());
+            log.info("Fetching all products from DB for user {}", userId);
+            List<Product> products = productQueryService.handle(new GetAllProductsQuery(userId));
             return ResponseEntity.ok(products);
         } catch (Exception e) {
-            log.error("Error fetching products from DB", e);
+            log.error("Error fetching products from DB for user {}", userId, e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
         }
     }
 
-    @GetMapping("/{productId}")
-    @Operation(summary = "Get a product by its ID from the DB")
-    public ResponseEntity<Product> getProductById(@PathVariable Long productId) {
+    @GetMapping("/users/{userId}/{productId}")
+    @Operation(summary = "Get a product by its ID from the DB for a user")
+    public ResponseEntity<Product> getProductById(
+            @PathVariable Long userId,
+            @PathVariable Long productId) {
         try {
-            var result = productQueryService.handle(new GetProductByIdQuery(productId));
+            var result = productQueryService.handle(new GetProductByIdQuery(productId, userId));
             return result.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
-            log.error("Error fetching product {} from DB", productId, e);
+            log.error("Error fetching product {} from DB for user {}", productId, userId, e);
             return ResponseEntity.notFound().build();
         }
     }
 
-    @PutMapping("/{productId}")
-    @Operation(summary = "Update an existing product by ID in the DB")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long productId,
-                                                 @RequestBody CreateProductResource resource) {
+    @PutMapping("/users/{userId}/{productId}")
+    @Operation(summary = "Update an existing product by ID in the DB for a user")
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long userId,
+            @PathVariable Long productId,
+            @RequestBody CreateProductResource resource) {
         try {
-            var existing = productRepository.findById(productId).orElse(null);
+            var existing = productRepository.findByProductIdAndUserId(productId, userId).orElse(null);
             if (existing == null) {
+                log.warn("Product {} not found for user {}", productId, userId);
                 return ResponseEntity.notFound().build();
             }
 
@@ -105,27 +112,35 @@ public class ProductsController {
                     existing.getProductId(),
                     resource.quantity(),
                     resource.expirationDate(),
-                    resource.price()
+                    resource.price(),
+                    userId
             );
             var updatedProduct = new Product(updatedCommand);
             productRepository.save(updatedProduct);
-            log.info("Successfully updated product {} in DB", productId);
+            log.info("Successfully updated product {} in DB for user {}", productId, userId);
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
-            log.error("Error updating product {} in DB", productId, e);
+            log.error("Error updating product {} in DB for user {}", productId, userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @DeleteMapping("/{productId}")
-    @Operation(summary = "Delete a product by ID from the DB")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
+    @DeleteMapping("/users/{userId}/{productId}")
+    @Operation(summary = "Delete a product by ID from the DB for a user")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable Long userId,
+            @PathVariable Long productId) {
         try {
+            var existing = productRepository.findByProductIdAndUserId(productId, userId).orElse(null);
+            if (existing == null) {
+                log.warn("Product {} not found for user {}", productId, userId);
+                return ResponseEntity.notFound().build();
+            }
             productRepository.deleteById(productId);
-            log.info("Deleted product {} from DB", productId);
+            log.info("Deleted product {} from DB for user {}", productId, userId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            log.error("Error deleting product {} from DB", productId, e);
+            log.error("Error deleting product {} from DB for user {}", productId, userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
