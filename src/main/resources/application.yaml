@@ -12,7 +12,7 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
   instance:
-    hostname: ${WEBSITE_HOSTNAME:localhost}
+    hostname: ${WEBSITE_HOSTNAME:${EUREKA_INSTANCE_HOSTNAME:localhost}}
     prefer-ip-address: false
     secure-port-enabled: true
     non-secure-port: 80
