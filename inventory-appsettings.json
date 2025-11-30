@@ -1,0 +1,47 @@
+[
+    {
+        "name": "DATABASE_URL",
+        "value": "jdbc:mysql://mysql-iam-ms.mysql.database.azure.com:3306/inventory?useSSL=true&requireSSL=false&serverTimezone=UTC",
+        "slotSetting": false
+    },
+    {
+        "name": "DATABASE_USERNAME",
+        "value": "adminuser",
+        "slotSetting": false
+    },
+    {
+        "name": "DATABASE_PASSWORD",
+        "value": "IAMPass2024!",
+        "slotSetting": false
+    },
+    {
+        "name": "JWT_SECRET",
+        "value": "change-me-please-change-me-please-32-bytes-min",
+        "slotSetting": false
+    },
+    {
+        "name": "EUREKA_ENABLED",
+        "value": "true",
+        "slotSetting": false
+    },
+    {
+        "name": "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE",
+        "value": "https://foodflow-service-registry.azurewebsites.net/eureka/",
+        "slotSetting": false
+    },
+    {
+        "name": "WEBSITES_PORT",
+        "value": "8085",
+        "slotSetting": false
+    },
+    {
+        "name": "WEBSITE_HOSTNAME",
+        "value": "inventory-microservice-app.azurewebsites.net",
+        "slotSetting": false
+    },
+    {
+        "name": "EUREKA_INSTANCE_HOSTNAME",
+        "value": "inventory-microservice-app.azurewebsites.net",
+        "slotSetting": false
+    }
+]
